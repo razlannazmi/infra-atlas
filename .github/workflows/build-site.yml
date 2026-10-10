@@ -1,0 +1,24 @@
+name: build site
+
+# The site source is private (razlannazmi/infra-atlas-site). When the docs it renders
+# change, run its build; it pushes the result to this repo's gh-pages branch.
+# Only pushes to main trigger this, so the gh-pages deploy can't loop back here.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/infra-component/**'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run the site workflow in infra-atlas-site
+        env:
+          # Fine-grained token: only infra-atlas-site, Actions read and write.
+          GH_TOKEN: ${{ secrets.SITE_DISPATCH_TOKEN }}
+        run: gh workflow run site.yml --repo razlannazmi/infra-atlas-site --ref main
